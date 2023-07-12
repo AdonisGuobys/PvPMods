@@ -1,6 +1,6 @@
 ﻿using ProjectM;
 using ProjectM.Network;
-using RPGMods.Utils;
+using PvPMods.Utils;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -10,9 +10,9 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
-using Cache = RPGMods.Utils.Cache;
+using Cache = PvPMods.Utils.Cache;
 
-namespace RPGMods.Systems
+namespace PvPMods.Systems
 {
     public static class ProximityLoop
     {

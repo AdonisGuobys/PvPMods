@@ -3,10 +3,10 @@ using ProjectM;
 using ProjectM.Network;
 using Unity.Collections;
 using Unity.Entities;
-using RPGMods.Utils;
-using RPGMods.Systems;
+using PvPMods.Utils;
+using PvPMods.Systems;
 
-namespace RPGMods.Hooks
+namespace PvPMods.Hooks
 {
     [HarmonyPatch(typeof(HandleCreateCharacterEventSystem), nameof(HandleCreateCharacterEventSystem.TryIsNameValid))]
     public class HandleCreateCharacterEventSystem_Patch

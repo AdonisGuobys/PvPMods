@@ -1,9 +1,9 @@
 ﻿using ProjectM;
-using RPGMods.Utils;
+using PvPMods.Utils;
 using System.Text.RegularExpressions;
 using VampireCommandFramework;
 
-namespace RPGMods.Commands
+namespace PvPMods.Commands
 {
     public static class Save {
         [Command("save", description: "Force the server to write RPGMods DB to a json file.", adminOnly: true)]

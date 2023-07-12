@@ -1,6 +1,6 @@
 ﻿using ProjectM;
 using ProjectM.Network;
-using RPGMods.Utils;
+using PvPMods.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace RPGMods.Systems
+namespace PvPMods.Systems
 {
     public class PvPSystem
     {
@@ -729,106 +729,20 @@ namespace RPGMods.Systems
             }, false);
         }*/
 
-        public static void SavePvPStat()
+        public static void SavePvPStat(string saveFolder)
         {
             //-- NEW
-            File.WriteAllText(AutoSaveSystem.mainSaveFolder+"pvpstats.json", JsonSerializer.Serialize(Database.PvPStats, Database.JSON_options));
-            File.WriteAllText(AutoSaveSystem.mainSaveFolder+"siegestates.json", JsonSerializer.Serialize(Database.SiegeState, Database.JSON_options));
+            File.WriteAllText(saveFolder+"pvpstats.json", JsonSerializer.Serialize(Database.PvPStats, Database.JSON_options));
+            File.WriteAllText(saveFolder+"siegestates.json", JsonSerializer.Serialize(Database.SiegeState, Database.JSON_options));
         }
 
         public static void LoadPvPStat()
         {
-            //-- NEW
-            if (!File.Exists(AutoSaveSystem.mainSaveFolder+"pvpstats.json"))
-            {
-                var stream = File.Create(AutoSaveSystem.mainSaveFolder+"pvpstats.json");
-                stream.Dispose();
-            }
-            string content = File.ReadAllText(AutoSaveSystem.mainSaveFolder+"pvpstats.json");
-            try
-            {
-                Database.PvPStats = JsonSerializer.Deserialize<ConcurrentDictionary<ulong, PvPData>>(content);
-                Plugin.Logger.LogWarning("PvPStats DB Populated.");
-            }
-            catch
-            {
-                Database.PvPStats = new ConcurrentDictionary<ulong, PvPData>();
-                Plugin.Logger.LogWarning("PvPStats DB Created.");
-            }
+            Database.PvPStats = new ConcurrentDictionary<ulong,PvPData>( Helper.LoadDB<ulong, PvPData>("pvpstats.json"));
+            Plugin.Logger.LogWarning("PvPStats DB Populated.");
+            Database.SiegeState = Helper.LoadDB<ulong, SiegeData>("siegestates.json");
+            Plugin.Logger.LogWarning("SiegeStates DB Populated.");
 
-            //-- Siege Mechanic
-            if (!File.Exists(AutoSaveSystem.mainSaveFolder+"siegestates.json"))
-            {
-                var stream = File.Create(AutoSaveSystem.mainSaveFolder+"siegestates.json");
-                stream.Dispose();
-            }
-            content = File.ReadAllText(AutoSaveSystem.mainSaveFolder+"siegestates.json");
-            try
-            {
-                Database.SiegeState = JsonSerializer.Deserialize<Dictionary<ulong, SiegeData>>(content);
-                Plugin.Logger.LogWarning("SiegeStates DB Populated.");
-            }
-            catch
-            {
-                Database.SiegeState = new Dictionary<ulong, SiegeData>();
-                Plugin.Logger.LogWarning("SiegeStates DB Created.");
-            }
-
-            //-- Transfer OLD Stats to new database.
-            if (File.Exists(AutoSaveSystem.mainSaveFolder+"pvpkills.json"))
-            {
-                string json = File.ReadAllText(AutoSaveSystem.mainSaveFolder+"pvpkills.json");
-                try
-                {
-                    Database.pvpkills = JsonSerializer.Deserialize<Dictionary<ulong, int>>(json);
-                    foreach (var item in Database.pvpkills)
-                    {
-                        Database.PvPStats.TryGetValue(item.Key, out var data);
-                        data.Kills = item.Value;
-                        Database.PvPStats[item.Key] = data;
-                    }
-                    Plugin.Logger.LogWarning("PvPKills DB Transfered.");
-                    File.Delete(AutoSaveSystem.mainSaveFolder+"pvpkills.json");
-                }
-                catch { }
-            }
-
-            if (File.Exists(AutoSaveSystem.mainSaveFolder+"pvpdeath.json"))
-            {
-                string json = File.ReadAllText(AutoSaveSystem.mainSaveFolder+"pvpdeath.json");
-                try
-                {
-                    Database.pvpdeath = JsonSerializer.Deserialize<Dictionary<ulong, int>>(json);
-                    foreach (var item in Database.pvpdeath)
-                    {
-                        Database.PvPStats.TryGetValue(item.Key, out var data);
-                        data.Deaths = item.Value;
-                        Database.PvPStats[item.Key] = data;
-                    }
-                    Plugin.Logger.LogWarning("PvPDeath DB Transfered.");
-                    File.Delete(AutoSaveSystem.mainSaveFolder+"pvpdeath.json");
-                }
-                catch { }
-            }
-            
-
-            if (File.Exists(AutoSaveSystem.mainSaveFolder+"pvpkd.json"))
-            {
-                string json = File.ReadAllText(AutoSaveSystem.mainSaveFolder+"pvpkd.json");
-                try
-                {
-                    Database.pvpkd = JsonSerializer.Deserialize<Dictionary<ulong, double>>(json);
-                    foreach (var item in Database.pvpkd)
-                    {
-                        Database.PvPStats.TryGetValue(item.Key, out var data);
-                        data.KD = Math.Round(item.Value, 2);
-                        Database.PvPStats[item.Key] = data;
-                    }
-                    Plugin.Logger.LogWarning("PvPKD DB Transfered.");
-                    File.Delete(AutoSaveSystem.mainSaveFolder+"pvpkd.json");
-                }
-                catch { }
-            }
         }
     }
 }

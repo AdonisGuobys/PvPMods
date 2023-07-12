@@ -1,8 +1,8 @@
 ﻿using ProjectM;
-using RPGMods.Utils;
+using PvPMods.Utils;
 using System.Text.RegularExpressions;
 
-namespace RPGMods.Commands
+namespace PvPMods.Commands
 {/*
     [Command("load", Usage = "load", Description = "Force the server to load RPGMods DB from a json file.")]
     public static class Load

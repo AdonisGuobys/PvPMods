@@ -1,6 +1,6 @@
 ﻿using ProjectM;
 using ProjectM.Network;
-using RPGMods.Hooks;
+using PvPMods.Hooks;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +9,7 @@ using Unity.Entities.UniversalDelegates;
 using UnityEngine.Networking.Types;
 using VampireCommandFramework;
 
-namespace RPGMods.Utils
+namespace PvPMods.Utils
 {
     public static class Output
     {

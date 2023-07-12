@@ -1,15 +1,15 @@
 ﻿using ProjectM;
 using ProjectM.Network;
-using RPGMods.Systems;
+using PvPMods.Systems;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Faction = RPGMods.Utils.Prefabs.Faction;
+using Faction = PvPMods.Utils.Prefabs.Faction;
 
-namespace RPGMods.Utils
+namespace PvPMods.Utils
 {
     public struct LevelData
     {
@@ -72,23 +72,6 @@ namespace RPGMods.Utils
         public int DailyPower { get; set; }
         public int RequiredPower { get; set; }
         public StatsBonus FactionBonus { get; set; }
-    }
-
-    public struct PlayerHeatData {
-        public struct Heat {
-            public int level { get; set; }
-            public DateTime lastAmbushed { get; set; }
-        }
-        
-        public Dictionary<Faction, Heat> heat { get; } = new();
-        public DateTime lastCooldown { get; set; }
-        public bool isLogging { get; set; }
-
-        public PlayerHeatData() {
-            foreach (Faction faction in FactionHeat.ActiveFactions) {
-                heat[faction] = new();
-            }
-        }
     }
 
     public struct PlayerGroup
@@ -211,103 +194,6 @@ namespace RPGMods.Utils
         {
             x = X;
             y = Y;
-        }
-    }
-    public struct newWaypointData {
-        public float x;
-        public float y;
-        public float z;
-        public newWaypointData(float X, float Y, float Z) {x = X; y = Y; z = Z; }
-    }
-
-        public struct WaypointData
-    {
-        public string Name { get; set; }
-        public ulong Owner { get; set; }
-        public float3 Location { get; set; }
-        public WaypointData(string name, ulong owner, float3 location)
-        {
-            Name = name;
-            Owner = owner;
-            Location = location;
-        }
-    }
-
-    public struct WeaponMasterDataOld
-    {
-        public int Spear { get; set; }
-        public int Sword { get; set; }
-        public int Scythe { get; set; }
-        public int Crossbow { get; set; }
-        public int Mace { get; set; }
-        public int Slashers { get; set; }
-        public int Axes { get; set; }
-        public int None { get; set; }
-        public int FishingPole { get; set; }
-        public int Spell { get; set; }
-
-        public WeaponMasterDataOld(int spear = 0, int sword = 0, int scythe = 0, int crossbow = 0, int mace = 0, int slashers = 0, int axes = 0, int none = 0, int fishingpole = 0, int spell = 0)
-        {
-            Spear = spear;
-            Sword = sword;
-            Scythe = scythe;
-            Crossbow = crossbow;
-            Mace = mace;
-            Slashers = slashers;
-            Axes = axes;
-            None = none;
-            FishingPole = fishingpole;
-            Spell = spell;
-        }
-    }
-
-
-    public struct BloodlineData{
-        public double[] strength { get; set; }
-        public double[] efficency { get; set; }
-        public double[] growth { get; set; }
-        public BloodlineData(double[] strengthIn, double[] efficencyIn, double[] growthIn){
-            strength = strengthIn;
-            efficency = efficencyIn;
-            growth = growthIn;
-        }
-        public BloodlineData() {
-            strength = new double[Bloodlines.rates.Length];
-            efficency = new double[Bloodlines.rates.Length];
-            growth = new double[Bloodlines.rates.Length];
-            for (int i = 0; i < strength.Length; i++) {
-                strength[i] = 0.0;
-                efficency[i] = 1.0;
-                growth[i] = 1.0;
-            }
-        }
-    }
-
-    public struct WeaponMasterData
-    {
-        public double[] mastery { get; set; }
-        public double[] efficency { get; set; }
-        public double[] growth { get; set; }
-
-        public WeaponMasterData(double[] strengthIn, double[] efficencyIn, double[] growthIn) {
-            mastery = strengthIn;
-            efficency = efficencyIn;
-            growth = growthIn;
-            for (int i = 0; i < mastery.Length; i++) {
-                mastery[i] = 0.0;
-                efficency[i] = 1.0;
-                growth[i] = 1.0;
-            }
-        }
-        public WeaponMasterData() {
-            mastery = new double[WeaponMasterSystem.masteryRates.Length];
-            efficency = new double[WeaponMasterSystem.masteryRates.Length];
-            growth = new double[WeaponMasterSystem.masteryRates.Length];
-            for (int i = 0; i < mastery.Length; i++) {
-                mastery[i] = 0.0;
-                efficency[i] = 1.0;
-                growth[i] = 1.0;
-            }
         }
     }
 

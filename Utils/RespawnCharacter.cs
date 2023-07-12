@@ -6,7 +6,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-namespace RPGMods.Utils
+namespace PvPMods.Utils
 {
     public class RespawnCharacter
     {

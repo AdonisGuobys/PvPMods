@@ -1,8 +1,8 @@
 ﻿using ProjectM;
-using RPGMods.Utils;
+using PvPMods.Utils;
 using Unity.Entities;
 
-namespace RPGMods.Systems
+namespace PvPMods.Systems
 {
     public static class SiegeSystem
     {

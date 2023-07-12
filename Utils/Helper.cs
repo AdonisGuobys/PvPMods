@@ -5,8 +5,8 @@ using System.Globalization;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using RPGMods.Hooks;
-using RPGMods.Systems;
+using PvPMods.Hooks;
+using PvPMods.Systems;
 using System.Text.RegularExpressions;
 using ProjectM.Scripting;
 using System.Collections.Generic;
@@ -16,10 +16,10 @@ using System.Reflection;
 using System.Collections;
 using System.Text.Json;
 using Epic.OnlineServices.Stats;
-using RPGMods.Commands;
+using PvPMods.Commands;
 using Unity.Entities.UniversalDelegates;
 
-namespace RPGMods.Utils
+namespace PvPMods.Utils
 {
     public class LazyDictionary<TKey,TValue> : Dictionary<TKey,TValue> where TValue : new()
     {
@@ -66,56 +66,19 @@ namespace RPGMods.Utils
             return true;
         }
 
-        public static ModifyUnitStatBuff_DOTS makeBuff(int statID, double strength) {
-            ModifyUnitStatBuff_DOTS buff;
-
-            var modType = ModificationType.Add;
-            if (Helper.inverseMultiplierStats.Contains(statID)) {
-                if (statID == (int)UnitStatType.CooldownModifier && !WeaponMasterSystem.CDRStacks) {
-                    modType = ModificationType.Set;
-                } else if (Helper.multiplierStats.Contains(statID)) {
-                    modType = ModificationType.Multiply;
-                }
-            }
-            buff = (new ModifyUnitStatBuff_DOTS() {
-                StatType = (UnitStatType)statID,
-                Value = (float)strength,
-                ModificationType = modType,
-                Id = ModificationId.NewId(0)
-            });
-            return buff;
-        }
-        public static bool humanReadablePercentageStats = false;
-        public static bool inverseMultipersDisplayReduction = true;
-        public static double calcBuffValue(double strength, double effectiveness, double rate, int statID) {
-
-            if (Helper.percentageStats.Contains(statID) && humanReadablePercentageStats) {
-                rate /= 100;
-            }
-                double value = strength * rate * effectiveness;
-            if (Helper.inverseMultiplierStats.Contains(statID)) {
-                if (WeaponMasterSystem.linearCDR) {
-                    value = strength * effectiveness;
-                    value = value / (value + rate);
-                } else {
-                    value = (strength * effectiveness) / (rate * 2);
-                }
-                value = 1 - value;
-            }
-            return value;
-        }
-
         public static bool GetServerGameSettings(out ServerGameSettings settings)
         {
             settings = Plugin.Server.GetExistingSystem<ServerGameSettingsSystem>()?._Settings;
             return true;
         }
 
+
+        public static bool allyLogging = false;
         // Get allies for PlayerCharacter (ie, every vampire in the clan), cached for 5 minutes
         // The list of allies includes PlayerCharacter.
         public static int GetAllies(Entity playerCharacter, out PlayerGroup playerGroup) {
             if (!Plugin.Server.EntityManager.HasComponent<PlayerCharacter>(playerCharacter)) {
-                if (ExperienceSystem.xpLogging) {
+                if (allyLogging) {
                     Plugin.Logger.LogInfo($"{DateTime.Now}: Entity is not user: {playerCharacter}");
                     Plugin.Logger.LogInfo($"{DateTime.Now}: Components for Player Character are: {Plugin.Server.EntityManager.Debug.GetEntityInfo(playerCharacter)}");
                 }
@@ -126,17 +89,17 @@ namespace RPGMods.Utils
                 return 0;
             }
 
-            if (ExperienceSystem.xpLogging) Plugin.Logger.LogInfo($"{DateTime.Now}: Beginning To Parse Player Group");
+            if (allyLogging) Plugin.Logger.LogInfo($"{DateTime.Now}: Beginning To Parse Player Group");
             if (Cache.PlayerAllies.TryGetValue(playerCharacter, out playerGroup)) {
-                if (ExperienceSystem.xpLogging) Plugin.Logger.LogInfo($"{DateTime.Now}: Allies Found in Cache, timestamp is {playerGroup.TimeStamp}");
+                if (allyLogging) Plugin.Logger.LogInfo($"{DateTime.Now}: Allies Found in Cache, timestamp is {playerGroup.TimeStamp}");
                 TimeSpan CacheAge = DateTime.Now - playerGroup.TimeStamp;
                 if (CacheAge.TotalSeconds < 300) return playerGroup.AllyCount;
-                if (ExperienceSystem.xpLogging) Plugin.Logger.LogInfo($"{DateTime.Now}: Refreshing cached allies");
+                if (allyLogging) Plugin.Logger.LogInfo($"{DateTime.Now}: Refreshing cached allies");
             }
             
             // Check if the player has a team
             if (!Plugin.Server.EntityManager.TryGetComponentData(playerCharacter, out Team playerTeam)) {
-                if (ExperienceSystem.xpLogging) {
+                if (allyLogging) {
                     Plugin.Logger.LogInfo($"{DateTime.Now}: Could not get team for Player Character: {playerCharacter}");
                     Plugin.Logger.LogInfo($"{DateTime.Now}: Components for Player Character are: {Plugin.Server.EntityManager.Debug.GetEntityInfo(playerCharacter)}");
                 }
@@ -145,7 +108,7 @@ namespace RPGMods.Utils
                     Allies = new Dictionary<Entity, Entity>()
                 };
                 return 0;
-            } else if (ExperienceSystem.xpLogging) {
+            } else if (allyLogging) {
                 Plugin.Logger.LogInfo($"{DateTime.Now}: Player Character Found Value: {playerTeam.Value} - Faction Index: {playerTeam.FactionIndex}");
             }
             
@@ -163,14 +126,14 @@ namespace RPGMods.Utils
                 Options = EntityQueryOptions.IncludeDisabled
             });
             var allyBuffer = query.ToEntityArray(Allocator.Temp);
-            if (ExperienceSystem.xpLogging) Plugin.Logger.LogInfo($"{DateTime.Now}: got connected PC entities buffer of length {allyBuffer.Length}");
+            if (allyLogging) Plugin.Logger.LogInfo($"{DateTime.Now}: got connected PC entities buffer of length {allyBuffer.Length}");
             
             foreach (var entity in allyBuffer) {
-                if (ExperienceSystem.xpLogging) Plugin.Logger.LogInfo(DateTime.Now + ": got Entity " + entity);
+                if (allyLogging) Plugin.Logger.LogInfo(DateTime.Now + ": got Entity " + entity);
                 if (Plugin.Server.EntityManager.HasComponent<PlayerCharacter>(entity)) {
-                    if (ExperienceSystem.xpLogging) Plugin.Logger.LogInfo(DateTime.Now + ": Entity is User " + entity);
+                    if (allyLogging) Plugin.Logger.LogInfo(DateTime.Now + ": Entity is User " + entity);
                     if (entity.Equals(playerCharacter)) {
-                        if (ExperienceSystem.xpLogging) Plugin.Logger.LogInfo(DateTime.Now + ": Entity is self");
+                        if (allyLogging) Plugin.Logger.LogInfo(DateTime.Now + ": Entity is self");
                         // We are an ally of ourself.
                         group[entity] = entity;
                         continue;
@@ -178,10 +141,10 @@ namespace RPGMods.Utils
 
                     bool allies = false;
                     try {
-                        if (ExperienceSystem.xpLogging)
+                        if (allyLogging)
                             Plugin.Logger.LogInfo(DateTime.Now + ": Trying to get teams ");
                         bool teamFound = Plugin.Server.EntityManager.TryGetComponentData(entity, out Team entityTeam);
-                        if (ExperienceSystem.xpLogging) {
+                        if (allyLogging) {
                             if (teamFound)
                                 Plugin.Logger.LogInfo(DateTime.Now + ": Team Value:" + entityTeam.Value +
                                                       " - Faction Index: " + entityTeam.FactionIndex);
@@ -195,23 +158,23 @@ namespace RPGMods.Utils
                         allies = teamFound && entityTeam.Value == playerTeam.Value;
                     }
                     catch (Exception e) {
-                        if (ExperienceSystem.xpLogging)
+                        if (allyLogging)
                             Plugin.Logger.LogInfo(DateTime.Now + ": IsAllies Failed " + e.Message);
                     }
 
                     if (allies) {
-                        if (ExperienceSystem.xpLogging)
+                        if (allyLogging)
                             Plugin.Logger.LogInfo($"{DateTime.Now}: Allies: {playerCharacter} - {entity}");
                         group[entity] = entity;
                     }
                     else {
-                        if (ExperienceSystem.xpLogging)
+                        if (allyLogging)
                             Plugin.Logger.LogInfo($"{DateTime.Now}: Not allies: {playerCharacter} - {entity}");
 
                     }
                 }
                 else {
-                    if (ExperienceSystem.xpLogging) Plugin.Logger.LogInfo(DateTime.Now + ": No Associated User!");
+                    if (allyLogging) Plugin.Logger.LogInfo(DateTime.Now + ": No Associated User!");
                 }
             }
 
@@ -660,7 +623,6 @@ namespace RPGMods.Utils
                 duration_final = default_duration + UniqueID;
             }
 
-            UnitSpawnerReactSystem_Patch.listen = true;
             identifier = duration_final;
             var Data = new SpawnNPCListen(duration, default, default, default, false);
             Cache.spawnNPC_Listen.Add(duration_final, Data);

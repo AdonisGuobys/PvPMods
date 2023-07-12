@@ -1,4 +1,4 @@
-﻿namespace RPGMods.Utils
+﻿namespace PvPMods.Utils
 {
     public static class Color
     {

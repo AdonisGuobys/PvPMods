@@ -9,7 +9,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-namespace RPGMods.Utils
+namespace PvPMods.Utils
 {
     public static class Cache
     {
@@ -29,17 +29,6 @@ namespace RPGMods.Utils
         // Note: These are currently only used in the HunterHunted system, but are able to be used generically
         public static Dictionary<ulong, DateTime> playerCombatStart = new();
         public static Dictionary<ulong, DateTime> playerCombatEnd = new();
-
-        //-- -- HunterHunted System
-        public static Dictionary<ulong, PlayerHeatData> heatCache = new();
-
-        //-- -- Mastery System
-        public static Dictionary<ulong, DateTime> player_last_combat = new();
-        public static Dictionary<ulong, int> player_combat_ticks = new();
-
-        //-- -- Experience System
-        public static Dictionary<ulong, float> player_level = new();
-        public static Dictionary <ulong,Dictionary<UnitStatType, float>> player_geartypedonned = new();
 
         //-- -- PvP System
         public static Dictionary<Entity, LevelData> PlayerLevelCache = new();
@@ -85,57 +74,18 @@ namespace RPGMods.Utils
         //public static Dictionary<ulong, ApplyBuffDebugEvent> playerBuffs = new();
         public static HashSet<ApplyBuffDebugEvent> playerBuffs = new();
         //-- -- Commands
-        public static Dictionary<ulong, bool> sunimmunity { get; set; }
-        public static Dictionary<ulong, bool> nocooldownlist { get; set; }
-        public static Dictionary<ulong, bool> godmode { get; set; }
-        public static Dictionary<ulong, bool> speeding { get; set; }
-        public static Dictionary<ulong, bool> autoRespawn { get; set; }
-        public static Dictionary<string, Tuple<float,float,float>> waypointDBNew { get; set; }
-
-        public static Dictionary<string, WaypointData> globalWaypoint { get; set; }
-        public static Dictionary<string, WaypointData> waypoints { get; set; }
-        public static Dictionary<ulong, int> waypoints_owned { get; set; }
         public static Dictionary<ulong, int> user_permission { get; set; }
         public static Dictionary<string, int> command_permission { get; set; }
-        public static Dictionary<ulong, PowerUpData> PowerUpList { get; set; }
 
-        //-- -- EXP System
-        public static Dictionary<ulong, int> player_experience { get; set; }
-        /// <summary>
-        /// Ability points awarded per level.
-        /// </summary>
-        public static Dictionary<ulong, int> player_abilityIncrease { get; set; }
-        /// <summary>
-        /// Buff stat bonuses from leveling
-        /// </summary>
-        public static LazyDictionary<ulong, LazyDictionary<UnitStatType,float>> player_level_stats { get; set; }   
-        /// <summary>
-        /// A configuration database of class stats per ability point spent.
-        /// </summary>
-        public static Dictionary<string, Dictionary<UnitStatType, float>> experience_class_stats { get; set; }
-        public static bool ErrorOnLoadingExperienceClasses = false;
-
-        public static Dictionary<ulong, bool> player_log_exp { get; set; }
 
         //-- -- PvP System
         //-- -- -- NEW Database
         public static ConcurrentDictionary<ulong, PvPData> PvPStats { get; set; }
         public static Dictionary<ulong, SiegeData> SiegeState = new();
-        public static Dictionary<Entity, Entity> killMap { get; set; }
         //-- -- -- OLD Database (To be removed)
         public static Dictionary<ulong, int> pvpkills { get; set; }
         public static Dictionary<ulong, int> pvpdeath { get; set; }
         public static Dictionary<ulong, double> pvpkd { get; set; }
-
-        //-- -- Mastery System
-        public static Dictionary<ulong, WeaponMasterData> player_weaponmastery { get; set; }
-        public static Dictionary<ulong, DateTime> player_decaymastery_logout { get; set; }
-        public static Dictionary<ulong, bool> player_log_mastery { get; set; }
-
-        //-- -- Bloodline System
-        public static Dictionary<ulong, BloodlineData> playerBloodline { get; set; }
-        public static Dictionary<ulong, DateTime> playerDecayBloodlineLogout { get; set; }
-        public static Dictionary<ulong, bool> playerLogBloodline { get; set; }
 
         //-- -- World Event System
         public static ConcurrentDictionary<int, FactionData> FactionStats { get; set; }

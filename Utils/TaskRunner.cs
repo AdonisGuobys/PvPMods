@@ -3,10 +3,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using RPGMods.Hooks;
+using PvPMods.Hooks;
 using Unity.Entities;
 
-namespace RPGMods.Utils
+namespace PvPMods.Utils
 {
     public class TaskRunner
     {

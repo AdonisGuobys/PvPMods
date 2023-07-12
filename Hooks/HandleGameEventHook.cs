@@ -1,12 +1,12 @@
 ﻿using HarmonyLib;
 using ProjectM.Gameplay.Systems;
-using RPGMods.Utils;
+using PvPMods.Utils;
 using ProjectM;
 using Unity.Entities;
 using System;
-using RPGMods.Systems;
+using PvPMods.Systems;
 
-namespace RPGMods.Hooks
+namespace PvPMods.Hooks
 {
     [HarmonyPatch(typeof(HandleGameplayEventsBase), nameof(HandleGameplayEventsBase.OnUpdate))]
     public class HandleGameplayEventsBase_Patch
@@ -16,7 +16,7 @@ namespace RPGMods.Hooks
         private static void Postfix(HandleGameplayEventsBase __instance)
         {
             //-- Player Location Caching
-            if (ExperienceSystem.isEXPActive || (PvPSystem.isHonorSystemEnabled && PvPSystem.isEnableHostileGlow && PvPSystem.isUseProximityGlow)) ProximityLoop.UpdateCache();
+            if ((PvPSystem.isHonorSystemEnabled && PvPSystem.isEnableHostileGlow && PvPSystem.isUseProximityGlow)) ProximityLoop.UpdateCache();
             //-- HonorSystem Hostile Glow
             if (PvPSystem.isHonorSystemEnabled && PvPSystem.isEnableHostileGlow && PvPSystem.isUseProximityGlow) ProximityLoop.HostileProximityGlow();
             /*

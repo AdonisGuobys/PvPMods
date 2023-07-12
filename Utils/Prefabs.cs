@@ -1,4 +1,4 @@
-﻿namespace RPGMods.Utils; 
+﻿namespace PvPMods.Utils; 
 
 // Note that these prefabs are as of Gloomrot launch
 // Thanks https://github.com/decaprime

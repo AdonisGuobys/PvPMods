@@ -5,13 +5,13 @@ using ProjectM.Gameplay.Systems;
 using ProjectM.Network;
 using ProjectM.Scripting;
 using ProjectM.Terrain;
-using RPGMods.Systems;
-using RPGMods.Utils;
+using PvPMods.Systems;
+using PvPMods.Utils;
 using Stunlock.Network;
 using System;
 using System.Reflection;
 
-namespace RPGMods.Hooks
+namespace PvPMods.Hooks
 {
     /*
     [HarmonyPatch(typeof(LoadPersistenceSystemV2), nameof(LoadPersistenceSystemV2.SetLoadState))]
@@ -109,10 +109,6 @@ namespace RPGMods.Hooks
                     {
                         var playerName = userData.CharacterName.ToString();
                         Helper.UpdatePlayerCache(userEntity, playerName, playerName);
-                    }
-                    if (WeaponMasterSystem.isDecaySystemEnabled && WeaponMasterSystem.isMasteryEnabled)
-                    {
-                        WeaponMasterSystem.DecayMastery(userEntity);
                     }
                 }
             }
