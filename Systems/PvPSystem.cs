@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Unity.Collections;
 using Unity.Entities;
+using VampireCommandFramework;
 
 namespace PvPMods.Systems
 {
@@ -168,7 +169,7 @@ namespace PvPMods.Systems
                     {
                         if (KillerStats.Reputation <= -1000) PvPSystem.HostileON(killer_id, KillerEntity, killer_userEntity);
                         KillerStats.Title = KillerHonorInfo.Title;
-                        if (isHonorTitleEnabled)
+                        if (isHonorTitleEnabled && isHonorSystemEnabled)
                         {
                             var true_name = Helper.GetTrueName(killer_name);
                             killer_name = "[" + KillerHonorInfo.Title + "]" + true_name;
@@ -252,7 +253,7 @@ namespace PvPMods.Systems
 
                         KillerStats.Title = KillerHonorInfo.Title;
 
-                        if (isHonorTitleEnabled)
+                        if (isHonorTitleEnabled && isHonorSystemEnabled)
                         {
                             var true_name = Helper.GetTrueName(killer_name);
                             killer_name = "[" + KillerHonorInfo.Title + "]" + true_name;
@@ -336,7 +337,7 @@ namespace PvPMods.Systems
                 if (siegeData.IsSiegeOn == false)
                 {
                     Cache.SteamPlayerCache.TryGetValue(SteamID, out var playerData);
-                    ServerChatUtils.SendSystemMessageToAllClients(em, $"{Utils.Color.Red(playerData.CharacterName.ToString())} has entered {Color.Red("Active Siege")}!");
+                    ServerChatUtils.SendSystemMessageToAllClients(em, $"{Utils.Color.Red(playerData.CharacterName.ToString())} has entered {Utils.Color.Red("Active Siege")}!");
 
                     siegeData.IsSiegeOn = true;
                     siegeData.SiegeEndTime = DateTime.Now.AddMinutes(PvPSystem.SiegeDuration);
@@ -355,7 +356,7 @@ namespace PvPMods.Systems
                 if (siegeData.IsSiegeOn == false)
                 {
                     Cache.SteamPlayerCache.TryGetValue(SteamID, out var playerData);
-                    ServerChatUtils.SendSystemMessageToAllClients(em, $"{Utils.Color.Red(playerData.CharacterName.ToString())} has entered {Color.Red("Active Siege")}!");
+                    ServerChatUtils.SendSystemMessageToAllClients(em, $"{Utils.Color.Red(playerData.CharacterName.ToString())} has entered {Utils.Color.Red("Active Siege")}!");
                 }
                 siegeData.IsSiegeOn = true;
                 siegeData.SiegeEndTime = DateTime.MinValue;
@@ -382,56 +383,7 @@ namespace PvPMods.Systems
             Database.SiegeState[SteamID] = new SiegeData(false, default, default);
             return true;
         }
-        /*
-        public static async Task SiegeList(Context ctx)
-        {
-            await Task.Yield();
 
-            List<string> messages = new List<string>();
-
-            IEnumerable<KeyValuePair<ulong, SiegeData>> SortedList;
-
-            SortedList = Database.SiegeState.Where(x => x.Value.IsSiegeOn == true).OrderByDescending(x => x.Value.SiegeEndTime - DateTime.Now);
-
-            int page = 0;
-            if (ctx.Args.Length >= 1 && int.TryParse(ctx.Args[0], out page))
-            {
-                page -= 1;
-            }
-
-            var recordsPerPage = 5;
-
-            var maxPage = (int)Math.Ceiling(Database.SiegeState.Count / (double)recordsPerPage);
-            page = Math.Min(maxPage - 1, page);
-
-            var List = SortedList.Skip(page * recordsPerPage).Take(recordsPerPage);
-            int order = (page * recordsPerPage);
-            messages.Add($"============ Siege List [{page+1}/{maxPage}] ============");
-            if (List.Count() == 0) messages.Add(Utils.Color.White("No Result"));
-            else
-            {
-                foreach (var result in List)
-                {
-                    order++;
-                    string PlayerName = Utils.Color.Teal(Cache.SteamPlayerCache[result.Key].CharacterName.ToString());
-                    TimeSpan span = result.Value.SiegeEndTime - DateTime.Now;
-                    var hSpan = Math.Round(span.TotalHours, 2);
-                    string tempDisplay = "[Duration " + hSpan + " hour(s)]";
-                    string DisplayStats = Utils.Color.White(tempDisplay);
-                    messages.Add($"{order}. {PlayerName} : {DisplayStats}");
-                }
-            }
-            messages.Add($"============ Siege List [{page+1}/{maxPage}] ============");
-
-            TaskRunner.Start(taskWorld =>
-            {
-                foreach (var m in messages)
-                {
-                    ctx.Reply(m);
-                }
-                return new object();
-            }, false);
-        }*/
 
         public static void OnEquipChange(Entity player)
         {
@@ -445,7 +397,6 @@ namespace PvPMods.Systems
                 Cache.PlayerLevelCache[player] = levelData;
             }
         }
-
         public static void OnCombatEngaged(Entity buffEntity, Entity player)
         {
             PrefabGUID GUID = em.GetComponentData<PrefabGUID>(buffEntity);
@@ -460,7 +411,6 @@ namespace PvPMods.Systems
                 Cache.PlayerLevelCache[player] = levelData;
             }
         }
-
         public static void PunishCheck(Entity Killer, Entity Victim)
         {
             Entity KillerUser = em.GetComponentData<PlayerCharacter>(Killer).UserEntity;
@@ -495,8 +445,8 @@ namespace PvPMods.Systems
                 Cache.OffenseLog[KillerSteamID] = OffenseData;
 
                 if (isAnnounceGrief) ServerChatUtils.SendSystemMessageToAllClients(Plugin.Server.EntityManager, $"" +
-                    $"Vampire {Color.Red(killerUserData.CharacterName.ToString())} (Lv.{KillerLevel}) " +
-                    $"grief-killed \"{Color.White(victimUserData.CharacterName.ToString())}\" (Lv.{VictimLevel})");
+                    $"Vampire {Utils.Color.Red(killerUserData.CharacterName.ToString())} (Lv.{(int)KillerLevel}) " +
+                    $"grief-killed \"{Utils.Color.White(victimUserData.CharacterName.ToString())}\" (Lv.{(int)VictimLevel})");
 
                 if (OffenseData.Offense >= OffenseLimit)
                 {
@@ -504,7 +454,6 @@ namespace PvPMods.Systems
                 }
             }
         }
-
         public static void BuffReceiver(Entity BuffEntity, PrefabGUID GUID)
         {
             if (GUID.Equals(Database.Buff.Severe_GarlicDebuff))
@@ -522,7 +471,6 @@ namespace PvPMods.Systems
                 Buffer.Add(PResist);
             }
         }
-
         public static void HonorBuffReceiver(Entity BuffEntity, PrefabGUID GUID)
         {
             if (isHonorBenefitEnabled == false) return;
@@ -574,7 +522,6 @@ namespace PvPMods.Systems
             }
             return;
         }
-
         public static void NewPlayerReceiver(Entity userEntity, Entity playerEntity, FixedString64 playerName)
         {
             if (isHonorTitleEnabled) Helper.RenamePlayer(userEntity, playerEntity, playerName);
@@ -587,7 +534,6 @@ namespace PvPMods.Systems
             var steamID = Plugin.Server.EntityManager.GetComponentData<User>(userEntity).PlatformId;
             Cache.HostilityState[playerEntity] = new StateData(steamID, false);
         }
-
         public static HonorRankInfo GetHonorTitle(int honorPoint)
         {
             HonorRankInfo rankInfo = new HonorRankInfo();
@@ -648,7 +594,6 @@ namespace PvPMods.Systems
             }
             return rankInfo;
         }
-
         public static void UpdateAllNames()
         {
             if (Database.PvPStats.Count > 0)
@@ -669,65 +614,6 @@ namespace PvPMods.Systems
                 }
             }
         }
-        /*
-        public static async Task TopRanks(Context ctx)
-        {
-            await Task.Yield();
-
-            List<string> messages = new List<string>();
-
-            IEnumerable<KeyValuePair<ulong, PvPData>> SortedList;
-
-            if (isHonorSystemEnabled && isSortByHonor)
-            {
-                SortedList = Database.PvPStats.OrderByDescending(x => x.Value.Reputation).ThenByDescending(x => x.Value.KD).ThenBy(x => x.Value.Kills);
-            }
-            else
-            {
-                SortedList = Database.PvPStats.OrderByDescending(x => x.Value.KD).ThenByDescending(x => x.Value.Kills).ThenBy(x => x.Value.Deaths);
-            }
-
-            var List = SortedList.Take(LadderLength);
-            int myRank = 0;
-            foreach (var pair in SortedList)
-            {
-                myRank += 1;
-                if (pair.Key == ctx.Event.User.PlatformId)
-                {
-                    messages.Add(Utils.Color.Green($"You're rank number #{myRank}!"));
-                    break;
-                }
-            }
-
-            messages.Add($"============ Leaderboard ============");
-            if (List.Count() == 0) messages.Add(Utils.Color.White("No Result"));
-            else
-            {
-                int i = 0;
-                foreach (var result in List)
-                {
-                    i++;
-                    string PlayerName = Utils.Color.Teal(result.Value.PlayerName);
-                    string tempDisplay = "[K/D " + result.Value.KD.ToString() + "]";
-                    if (isHonorSystemEnabled)
-                    {
-                        tempDisplay += " [REP " + result.Value.Reputation.ToString() + "]";
-                    }
-                    string DisplayStats = Utils.Color.White(tempDisplay);
-                    messages.Add($"{i}. {PlayerName} : {DisplayStats}");
-                }
-            }
-            messages.Add($"============ Leaderboard ============");
-
-            TaskRunner.Start(taskWorld =>
-            {
-                foreach (var m in messages)
-                {
-                    ctx.Reply(m);
-                }
-                return new object();
-            }, false);
-        }*/
 
         public static void SavePvPStat(string saveFolder)
         {

@@ -13,7 +13,7 @@ namespace PvPMods.Hooks
     {
         public static void Postfix(HandleCreateCharacterEventSystem __instance, Entity userEntity, string characterNameString, ref CreateCharacterFailureReason invalidReason, ref bool __result)
         {
-            if (PvPSystem.isHonorSystemEnabled)
+            if (PvPSystem.isHonorSystemEnabled && PvPSystem.isHonorSystemEnabled)
             {
                 if (__result)
                 {

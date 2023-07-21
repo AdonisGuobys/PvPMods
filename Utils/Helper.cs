@@ -52,6 +52,8 @@ namespace PvPMods.Utils
         public static bool deathLogging = true;
         public static PrefabGUID appliedBuff = Database.Buff.Buff_VBlood_Perk_Moose;
 
+        public static bool defaultSiegeState = true;
+
         public static Regex rxName = new Regex(@"(?<=\])[^\[].*");
         
         public static bool GetUserActivityGridSystem(out UserActivityGridSystem uags)
@@ -225,6 +227,10 @@ namespace PvPMods.Utils
                     Database.SiegeState.TryGetValue(userData.PlatformId, out var siegeData);
 
                     bool isHostile = HasBuff(userData.LocalCharacter._Entity, PvPSystem.HostileBuff);
+                    if(pvpStats.Reputation < 10000 && defaultSiegeState) {
+                        siegeData.IsSiegeOn = true;
+                    }
+
                     if ((pvpStats.Reputation <= -1000 || siegeData.IsSiegeOn) && isHostile == false) {
                         isHostile = true;
                         if (PvPSystem.isEnableHostileGlow && !PvPSystem.isUseProximityGlow) ApplyBuff(entity, userData.LocalCharacter._Entity, PvPSystem.HostileBuff);

@@ -25,7 +25,7 @@ using Wetstone.API;
 
 namespace PvPMods
 {
-    [BepInPlugin("PvPMods", "PvPMods", "0.1.0")]
+    [BepInPlugin("PvPMods", "PvPMods", "0.1.1")]
     [BepInDependency("gg.deca.VampireCommandFramework")]
 
     public class Plugin : BasePlugin
@@ -57,6 +57,7 @@ namespace PvPMods
         private static ConfigEntry<bool> UseProximityGlow;
 
         private static ConfigEntry<bool> BuffSiegeGolem;
+        private static ConfigEntry<bool> defaultSeigeState;
         private static ConfigEntry<float> GolemPhysicalReduction;
         private static ConfigEntry<float> GolemSpellReduction;
 
@@ -125,6 +126,7 @@ namespace PvPMods
             PunishDuration = Config.Bind("PvP", "Debuff Duration", 1800f, "Apply the punishment debuff for this amount of time.");
 
             BuffSiegeGolem = Config.Bind("Siege", "Buff Siege Golem", false, "Enabling this will reduce all incoming physical and spell damage according to config.");
+            defaultSeigeState = Config.Bind("Siege", "Default Siege State", true, "Sets the Default siege state to on.");
             GolemPhysicalReduction = Config.Bind("Siege", "Physical Damage Reduction", 0.5f, "Reduce incoming damage by this much. Ex.: 0.25 -> 25%");
             GolemSpellReduction = Config.Bind("Siege", "Spell Damage Reduction", 0.5f, "Reduce incoming spell damage by this much. Ex.: 0.75 -> 75%");
 
@@ -227,6 +229,7 @@ namespace PvPMods
             SiegeSystem.GolemPDef.Value = GolemPhysicalReduction.Value;
             SiegeSystem.GolemSDef.Value = GolemSpellReduction.Value;
 
+            Helper.defaultSiegeState = defaultSeigeState.Value;
 
             // Debug logging
             Helper.buffLogging = buffLogging.Value;

@@ -6,7 +6,7 @@ using VampireCommandFramework;
 namespace PvPMods.Commands
 {
     public static class Save {
-        [Command("save", description: "Force the server to write RPGMods DB to a json file.", adminOnly: true)]
+        [Command("savePvP", description: "Force the server to write PvPMods DB to a json file.", adminOnly: true)]
         public static void Initialize(ChatCommandContext ctx){
             ctx.Reply($"Saving data....");
             AutoSaveSystem.SaveDatabase();
